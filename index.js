@@ -20,7 +20,12 @@ const fs = require('fs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(reqLogger); // Logging middleware
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+// Configuring CORS
+const corsOptions = {
+  origin: 'http://localhost:3000', // Allow requests from this origin
+  credentials: true, // Allow cookies and authentication headers to be sent
+};
+app.use(cors(corsOptions));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Request logger middleware
@@ -65,8 +70,12 @@ app.get('/admin/projects', async (req, res) => {
   // Fetch and return projects
   res.json(await Project.find().sort({ createdAt: -1 }).limit(20));
 });
-
-const PORT = process.env.PORT || 6001;
+app.get('/admin/projects/:id', async(req,res)=>{
+  const {id}= req.params;
+  const postDoc = await Project.findById(id);
+  res.json(postDoc);
+})
+const PORT =  6001;
 
 // Connect to MongoDB and start the server
 mongoose
