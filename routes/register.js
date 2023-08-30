@@ -9,6 +9,8 @@ const jwt = require('jsonwebtoken')
 const secret='18ef1ae82268e75f0fe4bad8ff2eb167f96d803144fe07ce91bb8a5b243d665792275c7eec7460c3f9144612667f9886281d6ab5154d92cf98984ff9d2148a70'
 const cookieParser =require('cookie-parser')
 const salt = bcrypt.genSaltSync(10);
+
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
@@ -75,20 +77,21 @@ router.post('/login', async (req, res) => {
       return res.status(500).json({ message: 'An error occurred during login' });
     }
   });
-  app.use('/admin-panel', verifyToken, (req, res, next) => {
-    // If the token is valid, call the next middleware or route handler
-    // If the token is not valid or missing, handle it accordingly
-    next(); // Continue to the next middleware or route handler
-  }, /* other middleware */ (req, res) => {
-    // Your route handler logic here
-    // This is where you can perform actions for the /admin-panel route
-  
-    // For example, send a JSON response indicating successful access
-    res.status(200).json({ message: 'Authenticated user accessing admin panel' });
+ app.use('/admin-panel', verifyToken, (req, res, next) => {
+   // If the token is valid, call the next middleware or route handler
+  // If the token is not valid or missing, handle it accordingly
+   next(); // Continue to the next middleware or route handler
+ }, /* other middleware */ (req, res) => {
+   // Your route handler logic here
+ //   // This is where you can perform actions for the /admin-panel route
+  // For example, send a JSON response indicating successful access
+   res.status(200).json({ message: 'Authenticated user accessing admin panel' });
+});
+  router.get('/check-login', verifyToken, (req, res) => {
+    // If the middleware passes, the user is authenticated
+    res.status(200).json({ loggedIn: true });
   });
 
 module.exports =router;
 
 
-
-module.exports = router;

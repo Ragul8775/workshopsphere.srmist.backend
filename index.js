@@ -37,6 +37,7 @@ function reqLogger(req, res, next) {
 // Register route
 app.use('/admin/register', registerRouter);
 app.use('/admin', registerRouter);
+app.use('/admin', registerRouter)
 app.use('/admin/news',NewsRouter)
 
 // Post request for projects
@@ -65,18 +66,79 @@ app.post('/admin/projects', uploadMiddleware.single('file'), async (req, res) =>
   }
 });
 
+app.put('/admin/projects/:id', uploadMiddleware.single('file'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, summary, content } = req.body;
+
+    const updatedFields = {
+      title,
+      summary,
+      content,
+    };
+
+    if (req.file) {
+      const { originalname, path: filePath } = req.file;
+      const ext = path.extname(originalname);
+      const newPath = path.join(path.dirname(filePath), path.basename(filePath, ext) + ext);
+
+      // Rename the uploaded file
+      await fs.promises.rename(filePath, newPath);
+
+      updatedFields.cover = newPath;
+    }
+
+    // Update the project document
+    const updatedProject = await Project.findByIdAndUpdate(
+      id,
+      updatedFields,
+      { new: true } // Returns the updated document
+    );
+
+    res.json(updatedProject);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
 // GET request for project folder
 app.get('/admin/projects', async (req, res) => {
   // Fetch and return projects
   res.json(await Project.find().sort({ createdAt: -1 }).limit(20));
 });
-app.get('/admin/projects/:id', async(req,res)=>{
+app.get('/projects/:id', async(req,res)=>{
   const {id}= req.params;
   const postDoc = await Project.findById(id);
   res.json(postDoc);
 })
-const PORT =  6001;
+app.delete('/projects/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Find and delete the project by ID
+    const deletedProject = await Project.findByIdAndDelete(id);
 
+    if (!deletedProject) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Delete the cover image file associated with the project
+    if (deletedProject.cover) {
+      await fs.promises.unlink(deletedProject.cover);
+    }
+
+    res.json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+const PORT =  6001;
 // Connect to MongoDB and start the server
 mongoose
   .connect(process.env.MONGO_URL, {
