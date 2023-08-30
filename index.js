@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(reqLogger); // Logging middleware
 // Configuring CORS
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow requests from this origin
+  origin: '*', // Allow requests from this origin
   credentials: true, // Allow cookies and authentication headers to be sent
 };
 app.use(cors(corsOptions));
@@ -115,7 +115,7 @@ app.get('/projects/:id', async(req,res)=>{
   const postDoc = await Project.findById(id);
   res.json(postDoc);
 })
-<<<<<<< HEAD
+
 app.delete('/projects/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -138,9 +138,7 @@ app.delete('/projects/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-=======
 
->>>>>>> origin/main
 
 const PORT =  6001;
 // Connect to MongoDB and start the server
