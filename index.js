@@ -115,7 +115,32 @@ app.get('/projects/:id', async(req,res)=>{
   const postDoc = await Project.findById(id);
   res.json(postDoc);
 })
+<<<<<<< HEAD
+app.delete('/projects/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Find and delete the project by ID
+    const deletedProject = await Project.findByIdAndDelete(id);
 
+    if (!deletedProject) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Delete the cover image file associated with the project
+    if (deletedProject.cover) {
+      await fs.promises.unlink(deletedProject.cover);
+    }
+
+    res.json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+=======
+
+>>>>>>> origin/main
 
 const PORT =  6001;
 // Connect to MongoDB and start the server
