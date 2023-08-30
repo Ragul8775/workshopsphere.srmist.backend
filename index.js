@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(reqLogger); // Logging middleware
 // Configuring CORS
 const corsOptions = {
-  origin: '*', // Allow requests from this origin
+  origin: 'https://workshopsphere-srmist.vercel.app', // Allow requests from this origin
   credentials: true, // Allow cookies and authentication headers to be sent
 };
 app.use(cors(corsOptions));
